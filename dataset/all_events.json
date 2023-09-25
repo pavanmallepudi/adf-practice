@@ -1,0 +1,24 @@
+{
+	"name": "all_events",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "all_events",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"match_id": {
+					"value": "@dataset().match_id",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"match_id": {
+				"type": "Int"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

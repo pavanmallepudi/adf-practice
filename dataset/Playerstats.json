@@ -1,0 +1,33 @@
+{
+	"name": "Playerstats",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Playerstats",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"competition_id": {
+					"value": "@dataset().competition_id",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"season_id": {
+				"type": "Int"
+			},
+			"competition_id": {
+				"type": "Int"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "seasons/@{dataset().season_id}/player-stats",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

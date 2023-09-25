@@ -1,0 +1,37 @@
+{
+	"name": "team_stats",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "team_stats",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"competition_id": {
+					"value": "@dataset().competition_id",
+					"type": "Expression"
+				},
+				"season_id": {
+					"value": "@dataset().season_id",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"competition_id": {
+				"type": "Int"
+			},
+			"season_id": {
+				"type": "int"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@{dataset().season_id}/team-stats",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
