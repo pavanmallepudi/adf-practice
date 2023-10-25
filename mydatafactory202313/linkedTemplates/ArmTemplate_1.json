@@ -1,0 +1,545 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "mydatafactory202313"
+		},
+		"AzureBlobStorage800_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/98e31145-a6d6-41e3-a8fd-6c0a7841c08d/resourceGroups/sai_aceso/providers/Microsoft.Storage/storageAccounts/acesomlops"
+		},
+		"AzureBlobStorage800_properties_groupId": {
+			"type": "string",
+			"defaultValue": "blob"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/default/AzureBlobStorage800')]",
+			"type": "Microsoft.DataFactory/factories/managedVirtualNetworks/managedPrivateEndpoints",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"privateLinkResourceId": "[parameters('AzureBlobStorage800_properties_privateLinkResourceId')]",
+				"groupId": "[parameters('AzureBlobStorage800_properties_groupId')]"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/matches')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "matches for given competition and season",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"url": {
+								"value": "https://data.statsbombservices.com/api/v5/competitions/@{pipeline().parameters.competiton_id}/seasons/@{pipeline().parameters.season_id}/matches",
+								"type": "Expression"
+							},
+							"method": "GET",
+							"headers": {},
+							"disableCertValidation": true,
+							"authentication": {
+								"type": "Basic",
+								"username": "chloe.bailey@tottenhamhotspur.com",
+								"password": {
+									"type": "SecureString",
+									"value": "**********"
+								}
+							}
+						}
+					},
+					{
+						"name": "match_status_filter",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "matches for given competition and season",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@json(activity('matches for given competition and season').output.Response)",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().match_status,'available')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "filtering tot matches",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "match_status_filter",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('match_status_filter').output.Value",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@or(equals(item().home_team.home_team_name,'Tottenham Hotspur'),equals(item().away_team.away_team_name,'Tottenham Hotspur'))",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "extract_metrics",
+						"type": "ForEach",
+						"dependsOn": [
+							{
+								"activity": "filtering tot matches",
+								"dependencyConditions": [
+									"Completed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('filtering tot matches').output.Value",
+								"type": "Expression"
+							},
+							"isSequential": false,
+							"batchCount": 10,
+							"activities": [
+								{
+									"name": "player_stats",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"paginationRules": {
+												"supportRFC5988": "true"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings",
+												"copyBehavior": "FlattenHierarchy"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "RestResource1",
+											"type": "DatasetReference",
+											"parameters": {
+												"match_id": {
+													"value": "@item().match_id",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "output",
+											"type": "DatasetReference",
+											"parameters": {
+												"match_id": {
+													"value": "@item().match_id",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "all_events",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"paginationRules": {
+												"supportRFC5988": "true"
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobStorageWriteSettings",
+												"copyBehavior": "FlattenHierarchy"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "all_events",
+											"type": "DatasetReference",
+											"parameters": {
+												"match_id": {
+													"value": "@item().match_id",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DelimitedText1",
+											"type": "DatasetReference",
+											"parameters": {
+												"match_id": {
+													"value": "@item().match_id",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					},
+					{
+						"name": "Team stats",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings",
+									"copyBehavior": "FlattenHierarchy"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['account_id']"
+										},
+										"sink": {
+											"name": "account_id"
+										}
+									},
+									{
+										"source": {
+											"path": "$['team_name']"
+										},
+										"sink": {
+											"name": "team_name"
+										}
+									},
+									{
+										"source": {
+											"path": "$['team_id']"
+										},
+										"sink": {
+											"name": "team_id"
+										}
+									},
+									{
+										"source": {
+											"path": "$['competition_id']"
+										},
+										"sink": {
+											"name": "competition_id"
+										}
+									},
+									{
+										"source": {
+											"path": "$['competition_name']"
+										},
+										"sink": {
+											"name": "competition_name"
+										}
+									},
+									{
+										"source": {
+											"path": "$['season_id']"
+										},
+										"sink": {
+											"name": "season_id"
+										}
+									},
+									{
+										"source": {
+											"path": "$['season_name']"
+										},
+										"sink": {
+											"name": "season_name"
+										}
+									}
+								],
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "team_stats",
+								"type": "DatasetReference",
+								"parameters": {
+									"competition_id": {
+										"value": "@pipeline().parameters.competiton_id",
+										"type": "Expression"
+									},
+									"season_id": {
+										"value": "@pipeline().parameters.season_id",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "team_stats1",
+								"type": "DatasetReference",
+								"parameters": {
+									"season_id": {
+										"value": "@pipeline().parameters.season_id",
+										"type": "Expression"
+									},
+									"competition_id": {
+										"value": "@pipeline().parameters.competiton_id",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Player stats",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "RestSource",
+								"httpRequestTimeout": "00:01:40",
+								"requestInterval": "00.00:00:00.010",
+								"requestMethod": "GET",
+								"paginationRules": {
+									"supportRFC5988": "true"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobStorageWriteSettings",
+									"copyBehavior": "FlattenHierarchy"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"mappings": [
+									{
+										"source": {
+											"path": "$['account_id']"
+										},
+										"sink": {
+											"name": "account_id"
+										}
+									},
+									{
+										"source": {
+											"path": "$['player_id']"
+										},
+										"sink": {
+											"name": "player_id"
+										}
+									},
+									{
+										"source": {
+											"path": "$['player_name']"
+										},
+										"sink": {
+											"name": "player_name"
+										}
+									},
+									{
+										"source": {
+											"path": "$['team_id']"
+										},
+										"sink": {
+											"name": "team_id"
+										}
+									},
+									{
+										"source": {
+											"path": "$['team_name']"
+										},
+										"sink": {
+											"name": "team_name"
+										}
+									},
+									{
+										"source": {
+											"path": "$['competition_id']"
+										},
+										"sink": {
+											"name": "competition_id"
+										}
+									}
+								],
+								"mapComplexValuesToString": true
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "Playerstats",
+								"type": "DatasetReference",
+								"parameters": {
+									"season_id": {
+										"value": "@{pipeline().parameters.season_id}",
+										"type": "Expression"
+									},
+									"competition_id": {
+										"value": "@{pipeline().parameters.competiton_id}",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DelimitedText2",
+								"type": "DatasetReference",
+								"parameters": {
+									"season_id": {
+										"value": "@{pipeline().parameters.season_id}",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					},
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 1
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"competiton_id": {
+						"type": "Int"
+					},
+					"season_id": {
+						"type": "Int"
+					}
+				},
+				"variables": {
+					"match_id": {
+						"type": "Integer"
+					},
+					"match_ids": {
+						"type": "Array"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2023-09-14T13:09:02Z"
+			},
+			"dependsOn": []
+		}
+	]
+}

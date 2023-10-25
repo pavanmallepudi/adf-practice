@@ -1,0 +1,188 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "mydatafactory202313"
+		},
+		"Mylink_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Mylink'"
+		},
+		"Playerstats_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'Playerstats'"
+		},
+		"RestService1_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'RestService1'"
+		},
+		"RestService2_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'RestService2'"
+		},
+		"all_events_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'all_events'"
+		},
+		"team_stats_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'team_stats'"
+		},
+		"Playerstats_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://data.statsbombservices.com/api/v4/competitions/@{linkedService().competition_id}/"
+		},
+		"Playerstats_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"RestService1_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://data.statsbombservices.com/api/v5/competitions/"
+		},
+		"RestService1_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"RestService2_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://data.statsbombservices.com/api/v4/matches/@{linkedService().match_id}/player-stats"
+		},
+		"RestService2_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"all_events_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://data.statsbombservices.com/api/v8/events/@{linkedService().match_id}"
+		},
+		"all_events_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"team_stats_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://data.statsbombservices.com/api/v2/competitions/@{linkedService().competition_id}/seasons/"
+		},
+		"team_stats_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"AzureBlobStorage800_properties_privateLinkResourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/98e31145-a6d6-41e3-a8fd-6c0a7841c08d/resourceGroups/sai_aceso/providers/Microsoft.Storage/storageAccounts/acesomlops"
+		},
+		"AzureBlobStorage800_properties_groupId": {
+			"type": "string",
+			"defaultValue": "blob"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "mydatafactory202313_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"Mylink_connectionString": {
+						"value": "[parameters('Mylink_connectionString')]"
+					},
+					"Playerstats_password": {
+						"value": "[parameters('Playerstats_password')]"
+					},
+					"RestService1_password": {
+						"value": "[parameters('RestService1_password')]"
+					},
+					"RestService2_password": {
+						"value": "[parameters('RestService2_password')]"
+					},
+					"all_events_password": {
+						"value": "[parameters('all_events_password')]"
+					},
+					"team_stats_password": {
+						"value": "[parameters('team_stats_password')]"
+					},
+					"Playerstats_properties_typeProperties_url": {
+						"value": "[parameters('Playerstats_properties_typeProperties_url')]"
+					},
+					"Playerstats_properties_typeProperties_userName": {
+						"value": "[parameters('Playerstats_properties_typeProperties_userName')]"
+					},
+					"RestService1_properties_typeProperties_url": {
+						"value": "[parameters('RestService1_properties_typeProperties_url')]"
+					},
+					"RestService1_properties_typeProperties_userName": {
+						"value": "[parameters('RestService1_properties_typeProperties_userName')]"
+					},
+					"RestService2_properties_typeProperties_url": {
+						"value": "[parameters('RestService2_properties_typeProperties_url')]"
+					},
+					"RestService2_properties_typeProperties_userName": {
+						"value": "[parameters('RestService2_properties_typeProperties_userName')]"
+					},
+					"all_events_properties_typeProperties_url": {
+						"value": "[parameters('all_events_properties_typeProperties_url')]"
+					},
+					"all_events_properties_typeProperties_userName": {
+						"value": "[parameters('all_events_properties_typeProperties_userName')]"
+					},
+					"team_stats_properties_typeProperties_url": {
+						"value": "[parameters('team_stats_properties_typeProperties_url')]"
+					},
+					"team_stats_properties_typeProperties_userName": {
+						"value": "[parameters('team_stats_properties_typeProperties_userName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "mydatafactory202313_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AzureBlobStorage800_properties_privateLinkResourceId": {
+						"value": "[parameters('AzureBlobStorage800_properties_privateLinkResourceId')]"
+					},
+					"AzureBlobStorage800_properties_groupId": {
+						"value": "[parameters('AzureBlobStorage800_properties_groupId')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'mydatafactory202313_ArmTemplate_0')]"
+			]
+		}
+	]
+}

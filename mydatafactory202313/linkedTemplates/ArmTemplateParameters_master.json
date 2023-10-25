@@ -1,0 +1,69 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "mydatafactory202313"
+		},
+		"Mylink_connectionString": {
+			"value": ""
+		},
+		"Playerstats_password": {
+			"value": ""
+		},
+		"RestService1_password": {
+			"value": ""
+		},
+		"RestService2_password": {
+			"value": ""
+		},
+		"all_events_password": {
+			"value": ""
+		},
+		"team_stats_password": {
+			"value": ""
+		},
+		"Playerstats_properties_typeProperties_url": {
+			"value": "https://data.statsbombservices.com/api/v4/competitions/@{linkedService().competition_id}/"
+		},
+		"Playerstats_properties_typeProperties_userName": {
+			"value": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"RestService1_properties_typeProperties_url": {
+			"value": "https://data.statsbombservices.com/api/v5/competitions/"
+		},
+		"RestService1_properties_typeProperties_userName": {
+			"value": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"RestService2_properties_typeProperties_url": {
+			"value": "https://data.statsbombservices.com/api/v4/matches/@{linkedService().match_id}/player-stats"
+		},
+		"RestService2_properties_typeProperties_userName": {
+			"value": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"all_events_properties_typeProperties_url": {
+			"value": "https://data.statsbombservices.com/api/v8/events/@{linkedService().match_id}"
+		},
+		"all_events_properties_typeProperties_userName": {
+			"value": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"team_stats_properties_typeProperties_url": {
+			"value": "https://data.statsbombservices.com/api/v2/competitions/@{linkedService().competition_id}/seasons/"
+		},
+		"team_stats_properties_typeProperties_userName": {
+			"value": "chloe.bailey@tottenhamhotspur.com"
+		},
+		"AzureBlobStorage800_properties_privateLinkResourceId": {
+			"value": "/subscriptions/98e31145-a6d6-41e3-a8fd-6c0a7841c08d/resourceGroups/sai_aceso/providers/Microsoft.Storage/storageAccounts/acesomlops"
+		},
+		"AzureBlobStorage800_properties_groupId": {
+			"value": "blob"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
