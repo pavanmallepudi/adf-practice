@@ -94,7 +94,8 @@
 						"value": "@activity('filtering tot matches').output.Value",
 						"type": "Expression"
 					},
-					"isSequential": true,
+					"isSequential": false,
+					"batchCount": 10,
 					"activities": [
 						{
 							"name": "player_stats",
