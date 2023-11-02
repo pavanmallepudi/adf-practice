@@ -10,7 +10,8 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobStorageLocation",
-				"fileName": "victoria_failed_logs.txt",
+				"fileName": "3837234",
+				"folderPath": "output",
 				"container": "newcontainer"
 			},
 			"columnDelimiter": ",",
