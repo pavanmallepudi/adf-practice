@@ -3,8 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy data1",
-				"type": "Copy",
+				"name": "Web1",
+				"type": "WebActivity",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -15,25 +15,56 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "RestSource",
-						"httpRequestTimeout": "00:01:40",
-						"requestInterval": "00.00:00:00.010",
-						"requestMethod": "GET",
-						"paginationRules": {
-							"supportRFC5988": "true"
-						}
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "RestResource3",
-						"type": "DatasetReference"
+					"url": "https://fdapi.valdperformance.com/v2019q3/teams",
+					"method": "GET",
+					"headers": {
+						"Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkQ5QTM3MUY2NDBGM0JBQUQ2NDdBRjg5RTc3RDJDMzhBOERFOUQ5MjFSUzI1NiIsIng1dCI6IjJhTng5a0R6dXExa2V2aWVkOUxEaW8zcDJTRSIsInR5cCI6ImF0K2p3dCJ9.eyJpc3MiOiJodHRwczovL3NlY3VyaXR5LnZhbGRwZXJmb3JtYW5jZS5jb20iLCJuYmYiOjE2OTk1NTEzODYsImlhdCI6MTY5OTU1MTM4NiwiZXhwIjoxNjk5NTU4NTg2LCJhdWQiOlsiYXBpLmRhc2hib3JkIiwiYXBpLmR5bmFtbyIsImFwaS5leHRlcm5hbCIsImFwaS5mb3JjZWRlY2tzIl0sInNjb3BlIjpbImFwaS5kYXNoYm9yZCIsImFwaS5keW5hbW8iLCJhcGkuZXh0ZXJuYWwiLCJhcGkuZm9yY2VkZWNrcyJdLCJjbGllbnRfaWQiOiJXbG45dlAyZWlxa0N4QXc9PSIsImNsaWVudF9kYXNoYm9yZC50ZWFtSWRzIjoiMTIwIiwiY2xpZW50X2ZvcmNlZGVja3MucmVjb3JkaW5nQXBpIjoidHJ1ZSIsImp0aSI6IkUxQUIyQkE3MEYyRjIyMjI3M0U5RTZBREY1REY2MTM3In0.UZnuN7bz2LIU9u3S97WYCrCmgxDR9LeHGES6iVtrbBi6IPtv17hG9LbccbngxaPBkDCrwKnYTR8ic-Kn_h9GtY1iqRmCG78X1vsYlpTygRe2miND9edvw32jnUTgIcWvL6jPw2vsoWsSkYNlRw_FBn3uczpi7vmhYCJTVU1B5XjGYBbCkfWCDlUg3pR3sIbB3YjgLBOcuTyzGy0VH3JPZkpzHdnfS9jZqAgfJvB4mME1MYmw4WOViCvlm__oiEqG3OLL7RAJS28iFxLyhz2uky7dDZFxwQyU0Z3pfZIwHCfG4RA6loPtvdtkm8A7FlRloE7vbXWlBQEk66Y22nircQHmvwk1U5PKfyHuvQ8YAMlaS9W41nD7cvnvXckjh_ZN1Y92kJEBbSm1zTAj7unSRDwqTjL2J18kpmtE_MdoNqeeEuwlNtoO_o0l2NV3oqH9RWJ3BiIHPznXT53FjFcEqLdPvgjmrPcAlE1Kclkt-EzRhu_jWVRwEVdNgUDT0WAEGq_Sxwgb7wasFNWaQD-H8SPJCN2AZ5ZMmJPySw3LRWVWeEfhoCXCPINQSNkYr7v-INzGDes_XJMWVPdcnR-6cesDa_-Vcem4whpi_UIOxuFhs2brTO4wfUDBvJljOu03PK_V2kvi2L3_Vl57b1iD5-zl2Czp-qVvBFYU7uBHv88",
+						"accept": " application/json"
 					}
-				]
+				}
+			},
+			{
+				"name": "Web1_copy1",
+				"type": "WebActivity",
+				"dependsOn": [
+					{
+						"activity": "Web1",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://fdapi.valdperformance.com/v2019q3/teams/@{json(activity('Web1').output.Response)[0].id}/athletes",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"headers": {
+						"Authorization": "Bearer eyJhbGciOiJSUzI1NiIsImtpZCI6IkQ5QTM3MUY2NDBGM0JBQUQ2NDdBRjg5RTc3RDJDMzhBOERFOUQ5MjFSUzI1NiIsIng1dCI6IjJhTng5a0R6dXExa2V2aWVkOUxEaW8zcDJTRSIsInR5cCI6ImF0K2p3dCJ9.eyJpc3MiOiJodHRwczovL3NlY3VyaXR5LnZhbGRwZXJmb3JtYW5jZS5jb20iLCJuYmYiOjE2OTk1NTEzODYsImlhdCI6MTY5OTU1MTM4NiwiZXhwIjoxNjk5NTU4NTg2LCJhdWQiOlsiYXBpLmRhc2hib3JkIiwiYXBpLmR5bmFtbyIsImFwaS5leHRlcm5hbCIsImFwaS5mb3JjZWRlY2tzIl0sInNjb3BlIjpbImFwaS5kYXNoYm9yZCIsImFwaS5keW5hbW8iLCJhcGkuZXh0ZXJuYWwiLCJhcGkuZm9yY2VkZWNrcyJdLCJjbGllbnRfaWQiOiJXbG45dlAyZWlxa0N4QXc9PSIsImNsaWVudF9kYXNoYm9yZC50ZWFtSWRzIjoiMTIwIiwiY2xpZW50X2ZvcmNlZGVja3MucmVjb3JkaW5nQXBpIjoidHJ1ZSIsImp0aSI6IkUxQUIyQkE3MEYyRjIyMjI3M0U5RTZBREY1REY2MTM3In0.UZnuN7bz2LIU9u3S97WYCrCmgxDR9LeHGES6iVtrbBi6IPtv17hG9LbccbngxaPBkDCrwKnYTR8ic-Kn_h9GtY1iqRmCG78X1vsYlpTygRe2miND9edvw32jnUTgIcWvL6jPw2vsoWsSkYNlRw_FBn3uczpi7vmhYCJTVU1B5XjGYBbCkfWCDlUg3pR3sIbB3YjgLBOcuTyzGy0VH3JPZkpzHdnfS9jZqAgfJvB4mME1MYmw4WOViCvlm__oiEqG3OLL7RAJS28iFxLyhz2uky7dDZFxwQyU0Z3pfZIwHCfG4RA6loPtvdtkm8A7FlRloE7vbXWlBQEk66Y22nircQHmvwk1U5PKfyHuvQ8YAMlaS9W41nD7cvnvXckjh_ZN1Y92kJEBbSm1zTAj7unSRDwqTjL2J18kpmtE_MdoNqeeEuwlNtoO_o0l2NV3oqH9RWJ3BiIHPznXT53FjFcEqLdPvgjmrPcAlE1Kclkt-EzRhu_jWVRwEVdNgUDT0WAEGq_Sxwgb7wasFNWaQD-H8SPJCN2AZ5ZMmJPySw3LRWVWeEfhoCXCPINQSNkYr7v-INzGDes_XJMWVPdcnR-6cesDa_-Vcem4whpi_UIOxuFhs2brTO4wfUDBvJljOu03PK_V2kvi2L3_Vl57b1iD5-zl2Czp-qVvBFYU7uBHv88",
+						"accept": " application/json"
+					}
+				}
 			}
 		],
+		"parameters": {
+			"match_id": {
+				"type": "String"
+			}
+		},
+		"variables": {
+			"match_id": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
