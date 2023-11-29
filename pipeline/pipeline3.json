@@ -1,0 +1,37 @@
+{
+	"name": "pipeline3",
+	"properties": {
+		"activities": [
+			{
+				"name": "matches for given competition and season",
+				"type": "WebActivity",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"url": {
+						"value": "https://data.statsbombservices.com/api/v5/competitions",
+						"type": "Expression"
+					},
+					"method": "GET",
+					"disableCertValidation": true,
+					"authentication": {
+						"type": "Basic",
+						"username": "chloe.bailey@tottenhamhotspur.com",
+						"password": {
+							"type": "SecureString",
+							"value": "**********"
+						}
+					}
+				}
+			}
+		],
+		"annotations": []
+	}
+}
