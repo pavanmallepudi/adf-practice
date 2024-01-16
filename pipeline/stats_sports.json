@@ -23,7 +23,7 @@
 						"Content-Type": "application/json"
 					},
 					"body": {
-						"value": "{\"thirdPartyApiId\": \"b5c15906-ccb7-4466-af51-b90f9e9b0b9d\",\"sessionDate\": \"@{utcnow('yyyy-MM-ddThh:mm:ss.999Z')}\"}",
+						"value": "{\"thirdPartyApiId\": \"b5c15906-ccb7-4466-af51-b90f9e9b0b9d\",\"sessionStartDate\": \"@{utcnow('yyyy-MM-ddThh:mm:ss.999Z')}\"}",
 						"type": "Expression"
 					}
 				}
